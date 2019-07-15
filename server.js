@@ -22,7 +22,7 @@ server.get("/:id", async (req, res) => {
     })
     .catch(data => res.status(500).json(data));
 });
-server.post("/", async (req, res) => {
+server.post("/", requireSpecificBody, async (req, res) => {
   await db
     .add(req.body)
     .then(data => {
@@ -30,7 +30,7 @@ server.post("/", async (req, res) => {
     })
     .catch(data => res.status(500).json(data));
 });
-server.put("/:id", async (req, res) => {
+server.put("/:id", requireBody, async (req, res) => {
   await db
     .update(req.params.id, req.body)
     .then(data => {
@@ -49,4 +49,19 @@ server.delete("/:id", async (req, res) => {
     })
     .catch(data => res.status(404).json("This Account doesnt exist"));
 });
+
+function requireBody(req, res, next) {
+  if (req.body) {
+    next();
+  } else {
+    res.status(400).json("please provide a valid body");
+  }
+}
+function requireSpecificBody(req, res, next) {
+  if (req.body.name && req.body.budget) {
+    next();
+  } else {
+    res.status(400).json("please provide a valid body");
+  }
+}
 module.exports = server;
